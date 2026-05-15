@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Member, WEEKS, weekState } from "@/lib/data";
 import Sidebar, { NavItem } from "@/components/Sidebar";
+import WeekBar from "@/components/WeekBar";
 import KanbanBoard from "@/components/KanbanBoard";
 import MemberModal from "@/components/MemberModal";
 import MembersView from "@/components/MembersView";
@@ -108,14 +109,7 @@ export default function Home() {
   return (
     <div className="flex h-screen bg-[#0d0d10] text-white">
       <div className="sticky left-0 z-10 flex-shrink-0">
-        <Sidebar
-          weeks={WEEKS}
-          activeWeek={activeWeek}
-          onWeekChange={handleWeekChange}
-          activeNav={activeNav}
-          onNavChange={setActiveNav}
-          liveWeek={LIVE_WEEK}
-        />
+        <Sidebar activeNav={activeNav} onNavChange={setActiveNav} />
       </div>
 
       <div className="flex-1 flex flex-col overflow-x-auto overflow-y-hidden min-w-0">
@@ -196,6 +190,14 @@ export default function Home() {
             </button>
           </div>
         </div>
+
+        {/* ── Week tabs ──────────────────────────────────────────────────────── */}
+        <WeekBar
+          weeks={WEEKS}
+          activeWeek={activeWeek}
+          onWeekChange={handleWeekChange}
+          liveWeek={LIVE_WEEK}
+        />
 
         {/* ── Views ──────────────────────────────────────────────────────────── */}
         {activeNav === "Board" && (
