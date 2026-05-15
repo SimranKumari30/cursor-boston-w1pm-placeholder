@@ -1,65 +1,71 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import { MEMBERS, WEEKS } from "@/lib/data";
+import Sidebar from "@/components/Sidebar";
+import KanbanBoard from "@/components/KanbanBoard";
+import VotingSidebar from "@/components/VotingSidebar";
+
+const LIVE_WEEK = 1;
 
 export default function Home() {
+  const [activeWeek, setActiveWeek] = useState(1);
+  const [activeNav, setActiveNav] = useState<"Board" | "Members" | "Leaderboard" | "Reminders">("Board");
+
+  const week = WEEKS.find((w) => w.id === activeWeek)!;
+  const members = MEMBERS.filter((m) => m.week === activeWeek);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    /* Outer shell: sidebar pinned left, everything else scrolls */
+    <div className="flex h-screen bg-[#0d0d10] text-white">
+      {/* Left sidebar — sticky, never scrolls away */}
+      <div className="sticky left-0 z-10 flex-shrink-0">
+        <Sidebar
+          weeks={WEEKS}
+          activeWeek={activeWeek}
+          onWeekChange={setActiveWeek}
+          activeNav={activeNav}
+          onNavChange={setActiveNav}
+          liveWeek={LIVE_WEEK}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+      </div>
+
+      {/* Right pane: scrolls horizontally so kanban + voting are always reachable */}
+      <div className="flex-1 flex flex-col overflow-x-auto overflow-y-hidden min-w-0">
+        {/* Header — spans full width of scroll container */}
+        <div
+          className="flex items-center justify-between px-6 py-4 border-b border-[#1e1e24] flex-shrink-0"
+          style={{ minWidth: "860px" }}
+        >
+          <div>
+            <h1 className="text-lg font-bold text-white">{week.track}</h1>
+            <p className="text-xs text-gray-500 mt-0.5">
+              ~100 members · {week.deadline} deadline
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-xs font-medium px-3 py-1.5 rounded-lg">
+              <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse" />
+              28h left
+            </div>
+            <button className="bg-white text-black text-sm font-medium px-4 py-1.5 rounded-lg hover:bg-gray-200 transition-colors">
+              + Add submission
+            </button>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Board + voting — laid out side-by-side, min-width forces scroll when narrow */}
+        <div className="flex flex-1 overflow-y-hidden" style={{ minWidth: "860px" }}>
+          {/* Kanban: fills remaining width, scrolls if needed */}
+          <div className="flex-1 overflow-auto px-6 py-5">
+            <KanbanBoard members={members} />
+          </div>
+          {/* Voting sidebar */}
+          <div className="w-64 flex-shrink-0 px-5 py-5 border-l border-[#1e1e24] overflow-y-auto">
+            <VotingSidebar members={members} week={week} />
+          </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
