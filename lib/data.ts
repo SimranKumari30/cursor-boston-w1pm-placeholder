@@ -9,8 +9,6 @@ export interface Member {
   liveUrl?: string;
   loomUrl?: string;
   status: Status;
-  votes?: number;
-  competeForWin: boolean;
   week: number;
 }
 
@@ -19,43 +17,41 @@ export interface Week {
   label: string;
   track: string;
   deadline: string;
-  votingTime: string;
-  zoomUrl: string;
 }
 
 export const WEEKS: Week[] = [
-  { id: 1, label: "Week 1 · PM tool", track: "PM tool build", deadline: "Fri May 16 · 5pm EST", votingTime: "May 16 · 6pm EST", zoomUrl: "https://zoom.us/j/example" },
-  { id: 2, label: "Week 2 · Comms", track: "Comms tool", deadline: "Fri May 23 · 5pm EST", votingTime: "May 23 · 6pm EST", zoomUrl: "https://zoom.us/j/example" },
-  { id: 3, label: "Week 3 · Mkt", track: "Marketing tool", deadline: "Fri May 30 · 5pm EST", votingTime: "May 30 · 6pm EST", zoomUrl: "https://zoom.us/j/example" },
-  { id: 4, label: "Week 4 · Edu", track: "Education tool", deadline: "Fri Jun 6 · 5pm EST", votingTime: "Jun 6 · 6pm EST", zoomUrl: "https://zoom.us/j/example" },
-  { id: 5, label: "Week 5 · Startup", track: "Startup tool", deadline: "Fri Jun 13 · 5pm EST", votingTime: "Jun 13 · 6pm EST", zoomUrl: "https://zoom.us/j/example" },
-  { id: 6, label: "Week 6 · OSS", track: "OSS tool", deadline: "Fri Jun 20 · 5pm EST", votingTime: "Jun 20 · 6pm EST", zoomUrl: "https://zoom.us/j/example" },
+  { id: 1, label: "Week 1 · PM tool",   track: "PM tool build",    deadline: "Fri May 16 · 5pm EST" },
+  { id: 2, label: "Week 2 · Comms",     track: "Comms tool",       deadline: "Fri May 23 · 5pm EST" },
+  { id: 3, label: "Week 3 · Mkt",       track: "Marketing tool",   deadline: "Fri May 30 · 5pm EST" },
+  { id: 4, label: "Week 4 · Edu",       track: "Education tool",   deadline: "Fri Jun  6 · 5pm EST" },
+  { id: 5, label: "Week 5 · Startup",   track: "Startup tool",     deadline: "Fri Jun 13 · 5pm EST" },
+  { id: 6, label: "Week 6 · OSS",       track: "OSS tool",         deadline: "Fri Jun 20 · 5pm EST" },
 ];
 
-export const MEMBERS: Member[] = [
-  { id: "1", name: "Simran Kumari", githubHandle: "SimranKumari30", pitch: "Work in progress — will update before 5pm EST.", repoUrl: "https://github.com/SimranKumari30/cursor-boston-w1pm-placeholder", liveUrl: undefined, loomUrl: undefined, status: "pr_open", votes: 11, competeForWin: false, week: 1 },
-  { id: "2", name: "Sam Bell", githubHandle: "sambell", pitch: "A kanban board for dev teams that auto-syncs with GitHub PRs.", repoUrl: "https://github.com/sambell/shipboard", liveUrl: "https://shipboard.vercel.app", loomUrl: "https://loom.com/share/abc123", status: "submitted", votes: 14, competeForWin: true, week: 1 },
-  { id: "3", name: "Maya Rodriguez", githubHandle: "mayarod", pitch: "Kanban for shipping at the speed of thought.", repoUrl: "https://github.com/mayarod/flowtrack", liveUrl: "https://flowtrack.vercel.app", loomUrl: undefined, status: "in_progress", votes: 8, competeForWin: true, week: 1 },
-  { id: "4", name: "Tyler Nguyen", githubHandle: "tylern", pitch: "One-click PM with context switching.", repoUrl: "https://github.com/tylern/contextpm", liveUrl: undefined, loomUrl: undefined, status: "in_progress", votes: 6, competeForWin: true, week: 1 },
-  { id: "5", name: "Dana Lee", githubHandle: "danalee", pitch: "Visual sprint planning with AI suggestions.", repoUrl: "https://github.com/danalee/sprintviz", liveUrl: "https://sprintviz.vercel.app", loomUrl: "https://loom.com/share/def456", status: "submitted", votes: 7, competeForWin: true, week: 1 },
-  { id: "6", name: "Alex Kim", githubHandle: "alexkim", pitch: undefined, repoUrl: undefined, liveUrl: undefined, loomUrl: undefined, status: "not_started", votes: 0, competeForWin: false, week: 1 },
-  { id: "7", name: "Jordan Park", githubHandle: "jordanp", pitch: undefined, repoUrl: undefined, liveUrl: undefined, loomUrl: undefined, status: "not_started", votes: 0, competeForWin: false, week: 1 },
-  { id: "8", name: "Priya Sharma", githubHandle: "priyasharma", pitch: "Drag-and-drop task manager built for async teams.", repoUrl: "https://github.com/priyasharma/asyncboard", liveUrl: "https://asyncboard.vercel.app", loomUrl: "https://loom.com/share/ghi789", status: "submitted", votes: 5, competeForWin: true, week: 1 },
-  { id: "9", name: "Ethan Brooks", githubHandle: "ethanb", pitch: "Minimal todo tracker with weekly review.", repoUrl: "https://github.com/ethanb/weeklytrack", liveUrl: undefined, loomUrl: undefined, status: "pr_open", votes: 3, competeForWin: false, week: 1 },
+export const SEED_MEMBERS: Member[] = [
+  { id: "1", name: "Person 1",  githubHandle: "person1",  pitch: "A kanban board that auto-syncs with GitHub PRs.",         repoUrl: "https://github.com/person1/repo",  liveUrl: "https://person1.vercel.app", loomUrl: "https://loom.com/share/abc1", status: "submitted",   week: 1 },
+  { id: "2", name: "Person 2",  githubHandle: "person2",  pitch: "Kanban for shipping at the speed of thought.",            repoUrl: "https://github.com/person2/repo",  liveUrl: "https://person2.vercel.app", loomUrl: undefined,                    status: "in_progress", week: 1 },
+  { id: "3", name: "Person 3",  githubHandle: "person3",  pitch: "One-click PM with seamless context switching.",           repoUrl: "https://github.com/person3/repo",  liveUrl: undefined,                    loomUrl: undefined,                    status: "in_progress", week: 1 },
+  { id: "4", name: "Person 4",  githubHandle: "person4",  pitch: "Visual sprint planner with AI suggestions.",              repoUrl: "https://github.com/person4/repo",  liveUrl: "https://person4.vercel.app", loomUrl: "https://loom.com/share/abc4", status: "submitted",   week: 1 },
+  { id: "5", name: "Person 5",  githubHandle: "person5",  pitch: "Drag-and-drop task manager built for async teams.",       repoUrl: "https://github.com/person5/repo",  liveUrl: "https://person5.vercel.app", loomUrl: "https://loom.com/share/abc5", status: "submitted",   week: 1 },
+  { id: "6", name: "Person 6",  githubHandle: "person6",  pitch: undefined,                                                 repoUrl: undefined,                          liveUrl: undefined,                    loomUrl: undefined,                    status: "not_started", week: 1 },
+  { id: "7", name: "Person 7",  githubHandle: "person7",  pitch: undefined,                                                 repoUrl: undefined,                          liveUrl: undefined,                    loomUrl: undefined,                    status: "not_started", week: 1 },
+  { id: "8", name: "Person 8",  githubHandle: "person8",  pitch: "Minimal weekly review tracker.",                          repoUrl: "https://github.com/person8/repo",  liveUrl: undefined,                    loomUrl: undefined,                    status: "pr_open",     week: 1 },
+  { id: "9", name: "Person 9",  githubHandle: "person9",  pitch: "Focus timer integrated with your task list.",             repoUrl: "https://github.com/person9/repo",  liveUrl: undefined,                    loomUrl: undefined,                    status: "pr_open",     week: 1 },
 ];
 
 export const STATUS_LABELS: Record<Status, string> = {
   not_started: "NOT STARTED",
-  in_progress: "IN PROGRESS",
-  submitted: "SUBMITTED",
-  pr_open: "PR OPEN",
+  in_progress:  "IN PROGRESS",
+  submitted:    "SUBMITTED",
+  pr_open:      "PR OPEN",
 };
 
 export const STATUS_ORDER: Status[] = ["not_started", "in_progress", "submitted", "pr_open"];
 
 export function getMissingFields(member: Member): string[] {
   const missing: string[] = [];
-  if (!member.pitch) missing.push("pitch");
+  if (!member.pitch)   missing.push("pitch");
   if (!member.repoUrl) missing.push("repo");
   if (!member.liveUrl) missing.push("live URL");
   if (!member.loomUrl) missing.push("loom");
@@ -70,14 +66,28 @@ export function getInitials(name: string): string {
   return name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
 }
 
-export const AVATAR_COLORS: Record<string, string> = {
-  "SK": "#7C6FCD",
-  "SB": "#4F8EF7",
-  "MR": "#2ECC71",
-  "TN": "#E67E22",
-  "DL": "#9B59B6",
-  "AK": "#95A5A6",
-  "JP": "#95A5A6",
-  "PS": "#E74C3C",
-  "EB": "#1ABC9C",
-};
+const PALETTE = [
+  "#7C6FCD", "#4F8EF7", "#2ECC71", "#E67E22",
+  "#9B59B6", "#1ABC9C", "#E74C3C", "#3498DB", "#F39C12",
+];
+
+export function avatarColor(id: string): string {
+  const idx = parseInt(id, 10) % PALETTE.length;
+  return PALETTE[isNaN(idx) ? 0 : idx];
+}
+
+const STORAGE_KEY = "shiptrack_members";
+
+export function loadMembers(): Member[] {
+  if (typeof window === "undefined") return SEED_MEMBERS;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw) as Member[];
+  } catch { /* ignore */ }
+  return SEED_MEMBERS;
+}
+
+export function saveMembers(members: Member[]): void {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(members));
+}

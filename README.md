@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ShipTrack
 
-## Getting Started
+A real-time PM tool for tracking weekly project submissions across a 6-week cohort program.
 
-First, run the development server:
+## What it does
+
+ShipTrack gives cohort organizers a live kanban view of who's shipping what each week. Each person's card shows their pitch, links to their repo/live URL/loom, and which fields are still missing — so you can tell at a glance who needs a nudge.
+
+**Board columns**
+| Column | Meaning |
+|---|---|
+| Not Started | No submission started |
+| In Progress | Working on it |
+| Submitted | PR merged / live |
+| PR Open | Pull request open, under review |
+
+**Card states**
+- Gray pills = missing fields (pitch, repo, live URL, loom)
+- Green border = all fields filled in
+
+## Features
+
+- **4-column kanban** per week, with live member counts
+- **Click any card** to edit — update name, pitch, URLs, status
+- **Add submission** button to add new members on the fly
+- **Delete** a submission from the edit modal
+- **6-week switcher** in the sidebar — each week is independent
+- **Persisted locally** — all changes saved to `localStorage`, survive page refreshes
+- **Live header stats** — submitted / in progress / total counts update instantly
+
+## Running locally
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Tech stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- [Next.js 16](https://nextjs.org/) (App Router)
+- [Tailwind CSS v4](https://tailwindcss.com/)
+- TypeScript
+- `localStorage` for real-time persistence (no backend required)
 
-## Learn More
+## Project structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+app/
+  page.tsx          # Root page — state, layout, modal wiring
+  layout.tsx        # HTML shell
+  globals.css       # Base styles
+components/
+  Sidebar.tsx       # Left nav + week switcher
+  KanbanBoard.tsx   # 4-column board
+  MemberCard.tsx    # Individual submission card
+  MemberModal.tsx   # Add / edit modal
+lib/
+  data.ts           # Types, seed data, localStorage helpers
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Roadmap
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [ ] Drag-and-drop between columns
+- [ ] Per-week deadline countdown
+- [ ] Export submissions as CSV
+- [ ] Backend sync (Supabase / PlanetScale)

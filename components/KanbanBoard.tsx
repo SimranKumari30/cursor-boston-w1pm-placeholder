@@ -5,6 +5,7 @@ import MemberCard from "./MemberCard";
 
 interface KanbanBoardProps {
   members: Member[];
+  onEdit: (member: Member) => void;
 }
 
 const COLUMN_ACCENT: Record<Status, string> = {
@@ -14,18 +15,18 @@ const COLUMN_ACCENT: Record<Status, string> = {
   pr_open:      "text-green-400",
 };
 
-export default function KanbanBoard({ members }: KanbanBoardProps) {
+export default function KanbanBoard({ members, onEdit }: KanbanBoardProps) {
   const grouped = STATUS_ORDER.reduce<Record<Status, Member[]>>(
     (acc, s) => ({ ...acc, [s]: members.filter((m) => m.status === s) }),
     {} as Record<Status, Member[]>
   );
 
   return (
-    <div className="flex gap-4 pb-4 h-full">
+    <div className="flex gap-4 h-full">
       {STATUS_ORDER.map((status) => {
         const cards = grouped[status];
         return (
-          <div key={status} className="flex-1 min-w-[220px] flex flex-col gap-3">
+          <div key={status} className="flex-1 min-w-[200px] flex flex-col gap-3">
             <div className="flex items-center gap-2 px-1">
               <span className={`text-[11px] font-semibold tracking-widest uppercase ${COLUMN_ACCENT[status]}`}>
                 {STATUS_LABELS[status]}
@@ -34,7 +35,7 @@ export default function KanbanBoard({ members }: KanbanBoardProps) {
             </div>
             <div className="flex flex-col gap-2.5">
               {cards.map((member) => (
-                <MemberCard key={member.id} member={member} />
+                <MemberCard key={member.id} member={member} onClick={() => onEdit(member)} />
               ))}
             </div>
           </div>
