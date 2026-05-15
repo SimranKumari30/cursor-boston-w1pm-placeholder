@@ -19,13 +19,14 @@ export default function WeekBar({ weeks, activeWeek, onWeekChange, liveWeek }: W
         return (
           <button
             key={week.id}
-            onClick={() => onWeekChange(week.id)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs whitespace-nowrap transition-colors flex-shrink-0 ${
-              isActive
-                ? "bg-[#2a2a38] text-white font-medium"
-                : state === "live"
-                ? "text-gray-400 hover:text-white hover:bg-[#1e1e28]"
-                : "text-gray-600 hover:text-gray-400 hover:bg-[#1e1e28]"
+            onClick={() => state === "live" && onWeekChange(week.id)}
+            disabled={state !== "live"}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs whitespace-nowrap flex-shrink-0 ${
+              state === "live"
+                ? isActive
+                  ? "bg-[#2a2a38] text-white font-medium cursor-pointer"
+                  : "text-gray-400 hover:text-white hover:bg-[#1e1e28] cursor-pointer transition-colors"
+                : "text-gray-700 cursor-not-allowed"
             }`}
           >
             {week.label}
@@ -36,6 +37,9 @@ export default function WeekBar({ weeks, activeWeek, onWeekChange, liveWeek }: W
             )}
             {state === "past" && (
               <span className="text-[8px] text-gray-700">done</span>
+            )}
+            {state === "upcoming" && (
+              <span className="text-[8px] text-gray-700">soon</span>
             )}
           </button>
         );
