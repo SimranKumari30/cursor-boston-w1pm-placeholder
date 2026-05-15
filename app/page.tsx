@@ -6,6 +6,7 @@ import Sidebar, { NavItem } from "@/components/Sidebar";
 import KanbanBoard from "@/components/KanbanBoard";
 import MemberModal from "@/components/MemberModal";
 import MembersView from "@/components/MembersView";
+import TrackerView from "@/components/TrackerView";
 
 const LIVE_WEEK = 1;
 const POLL_INTERVAL_MS = 60_000; // re-fetch GitHub every 60 s
@@ -168,14 +169,14 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Board or Members view */}
-        {activeNav === "Board" ? (
+        {/* Board / Members / Tracker views */}
+        {activeNav === "Board" && (
           <div className="flex-1 overflow-y-hidden px-6 py-5" style={{ minWidth: "680px" }}>
             <KanbanBoard members={members} onEdit={(m) => setEditTarget(m)} />
           </div>
-        ) : (
-          <MembersView members={members} />
         )}
+        {activeNav === "Members" && <MembersView members={members} />}
+        {activeNav === "Tracker" && <TrackerView />}
       </div>
 
       {/* Add / edit modal */}

@@ -2,7 +2,7 @@
 
 import { Week } from "@/lib/data";
 
-export type NavItem = "Board" | "Members";
+export type NavItem = "Board" | "Members" | "Tracker";
 
 interface SidebarProps {
   weeks: Week[];
@@ -16,6 +16,7 @@ interface SidebarProps {
 const NAV_ITEMS: { id: NavItem; icon: string }[] = [
   { id: "Board",   icon: "⊞" },
   { id: "Members", icon: "⊟" },
+  { id: "Tracker", icon: "⊠" },
 ];
 
 export default function Sidebar({
