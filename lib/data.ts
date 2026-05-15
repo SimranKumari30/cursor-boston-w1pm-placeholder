@@ -45,7 +45,7 @@ export const WEEK_CONFIG: Record<number, WeekConfig> = {
 export const UPSTREAM_REPO = "rogerSuperBuilderAlpha/cursor-boston";
 
 export const WEEKS: Week[] = [
-  { id: 1, label: "Week 1 · PM tool",  track: "PM tool build",   deadline: "Fri May 16 · 5pm EST",  deadlineDate: "2026-05-16" },
+  { id: 1, label: "Week 1 · PM tool",  track: "PM tool build",   deadline: "Fri May 15 · 5pm EST",  deadlineDate: "2026-05-15" },
   { id: 2, label: "Week 2 · Comms",    track: "Comms tool",      deadline: "Fri May 23 · 5pm EST",  deadlineDate: "2026-05-23" },
   { id: 3, label: "Week 3 · Mkt",      track: "Marketing tool",  deadline: "Fri May 30 · 5pm EST",  deadlineDate: "2026-05-30" },
   { id: 4, label: "Week 4 · Edu",      track: "Education tool",  deadline: "Fri Jun  6 · 5pm EST",  deadlineDate: "2026-06-06" },
