@@ -2,16 +2,17 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Member, WEEKS } from "@/lib/data";
-import Sidebar from "@/components/Sidebar";
+import Sidebar, { NavItem } from "@/components/Sidebar";
 import KanbanBoard from "@/components/KanbanBoard";
 import MemberModal from "@/components/MemberModal";
+import MembersView from "@/components/MembersView";
 
 const LIVE_WEEK = 1;
 const POLL_INTERVAL_MS = 60_000; // re-fetch GitHub every 60 s
 
 export default function Home() {
   const [activeWeek, setActiveWeek] = useState(1);
-  const [activeNav, setActiveNav] = useState<"Board" | "Members" | "Leaderboard" | "Reminders">("Board");
+  const [activeNav, setActiveNav] = useState<NavItem>("Board");
 
   // GitHub-fetched members (source of truth for submitted / pr_open)
   const [ghMembers, setGhMembers] = useState<Member[]>([]);
@@ -167,10 +168,14 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Kanban */}
-        <div className="flex-1 overflow-y-hidden px-6 py-5" style={{ minWidth: "680px" }}>
-          <KanbanBoard members={members} onEdit={(m) => setEditTarget(m)} />
-        </div>
+        {/* Board or Members view */}
+        {activeNav === "Board" ? (
+          <div className="flex-1 overflow-y-hidden px-6 py-5" style={{ minWidth: "680px" }}>
+            <KanbanBoard members={members} onEdit={(m) => setEditTarget(m)} />
+          </div>
+        ) : (
+          <MembersView members={members} />
+        )}
       </div>
 
       {/* Add / edit modal */}

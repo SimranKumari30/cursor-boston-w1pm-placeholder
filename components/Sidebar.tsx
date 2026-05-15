@@ -2,7 +2,7 @@
 
 import { Week } from "@/lib/data";
 
-type NavItem = "Board" | "Members" | "Leaderboard" | "Reminders";
+export type NavItem = "Board" | "Members";
 
 interface SidebarProps {
   weeks: Week[];
@@ -13,14 +13,10 @@ interface SidebarProps {
   liveWeek: number;
 }
 
-const NAV_ITEMS: NavItem[] = ["Board", "Members", "Leaderboard", "Reminders"];
-
-const NAV_ICONS: Record<NavItem, string> = {
-  Board: "⊞",
-  Members: "⊟",
-  Leaderboard: "⊠",
-  Reminders: "⊡",
-};
+const NAV_ITEMS: { id: NavItem; icon: string }[] = [
+  { id: "Board",   icon: "⊞" },
+  { id: "Members", icon: "⊟" },
+];
 
 export default function Sidebar({
   weeks,
@@ -40,18 +36,18 @@ export default function Sidebar({
 
       {/* Nav */}
       <div className="px-2 py-3 border-b border-[#1e1e24]">
-        {NAV_ITEMS.map((item) => (
+        {NAV_ITEMS.map(({ id, icon }) => (
           <button
-            key={item}
-            onClick={() => onNavChange(item)}
+            key={id}
+            onClick={() => onNavChange(id)}
             className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors ${
-              activeNav === item
+              activeNav === id
                 ? "bg-[#2a2a38] text-white font-medium"
                 : "text-gray-500 hover:text-gray-300 hover:bg-[#1e1e28]"
             }`}
           >
-            <span className="text-base leading-none">{NAV_ICONS[item]}</span>
-            {item}
+            <span className="text-base leading-none">{icon}</span>
+            {id}
           </button>
         ))}
       </div>
