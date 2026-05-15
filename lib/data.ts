@@ -19,6 +19,22 @@ export interface Week {
   deadline: string;
 }
 
+export interface WeekConfig {
+  branch: string;
+  submissionsPath: string;
+}
+
+export const WEEK_CONFIG: Record<number, WeekConfig> = {
+  1: { branch: "c1w1pm-submission",      submissionsPath: "content/summer-cohort/c1/w1-pm/submissions" },
+  2: { branch: "c1w2comms-submission",   submissionsPath: "content/summer-cohort/c1/w2-comms/submissions" },
+  3: { branch: "c1w3mkt-submission",     submissionsPath: "content/summer-cohort/c1/w3-mkt/submissions" },
+  4: { branch: "c1w4edu-submission",     submissionsPath: "content/summer-cohort/c1/w4-edu/submissions" },
+  5: { branch: "c1w5startup-submission", submissionsPath: "content/summer-cohort/c1/w5-startup/submissions" },
+  6: { branch: "c1w6oss-submission",     submissionsPath: "content/summer-cohort/c1/w6-oss/submissions" },
+};
+
+export const UPSTREAM_REPO = "rogerSuperBuilderAlpha/cursor-boston";
+
 export const WEEKS: Week[] = [
   { id: 1, label: "Week 1 · PM tool",   track: "PM tool build",    deadline: "Fri May 16 · 5pm EST" },
   { id: 2, label: "Week 2 · Comms",     track: "Comms tool",       deadline: "Fri May 23 · 5pm EST" },

@@ -8,6 +8,7 @@ interface MemberModalProps {
   onSave: (member: Member) => void;
   onDelete?: (id: string) => void;
   onClose: () => void;
+  readOnly?: boolean;      // true for GitHub-sourced entries
 }
 
 const EMPTY: Omit<Member, "id" | "week"> = {
@@ -24,7 +25,8 @@ function field(
   label: string,
   value: string,
   onChange: (v: string) => void,
-  placeholder?: string
+  placeholder?: string,
+  disabled?: boolean
 ) {
   return (
     <div className="flex flex-col gap-1">
@@ -33,13 +35,14 @@ function field(
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="bg-[#1a1a22] border border-[#2e2e3a] rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#4a4a60] transition-colors"
+        disabled={disabled}
+        className="bg-[#1a1a22] border border-[#2e2e3a] rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#4a4a60] transition-colors disabled:opacity-50 disabled:cursor-default"
       />
     </div>
   );
 }
 
-export default function MemberModal({ member, onSave, onDelete, onClose }: MemberModalProps) {
+export default function MemberModal({ member, onSave, onDelete, onClose, readOnly = false }: MemberModalProps) {
   const isNew = !member;
   const [form, setForm] = useState<Omit<Member, "id" | "week">>(
     member
@@ -81,39 +84,48 @@ export default function MemberModal({ member, onSave, onDelete, onClose }: Membe
       <div className="bg-[#141418] border border-[#2e2e3a] rounded-2xl w-full max-w-md mx-4 p-6 flex flex-col gap-5">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold text-white">
-            {isNew ? "Add submission" : "Edit submission"}
-          </h2>
+          <div>
+            <h2 className="text-base font-semibold text-white">
+              {isNew ? "Add submission" : "View submission"}
+            </h2>
+            {readOnly && (
+              <p className="text-[10px] text-gray-600 mt-0.5">
+                Sourced from GitHub · read-only
+              </p>
+            )}
+          </div>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-300 text-xl leading-none">×</button>
         </div>
 
         {/* Fields */}
         <div className="flex flex-col gap-3">
-          {field("Name", form.name, set("name"), "Person N")}
-          {field("GitHub handle", form.githubHandle, set("githubHandle"), "username")}
-          {field("Pitch", form.pitch ?? "", set("pitch"), "One-line description of your project")}
-          {field("Repo URL", form.repoUrl ?? "", set("repoUrl"), "https://github.com/…")}
-          {field("Live URL", form.liveUrl ?? "", set("liveUrl"), "https://…")}
-          {field("Loom URL", form.loomUrl ?? "", set("loomUrl"), "https://loom.com/share/…")}
+          {field("Name", form.name, readOnly ? () => {} : set("name"), "Person N", readOnly)}
+          {field("GitHub handle", form.githubHandle, readOnly ? () => {} : set("githubHandle"), "username", readOnly)}
+          {field("Pitch", form.pitch ?? "", readOnly ? () => {} : set("pitch"), "One-line description of your project", readOnly)}
+          {field("Repo URL", form.repoUrl ?? "", readOnly ? () => {} : set("repoUrl"), "https://github.com/…", readOnly)}
+          {field("Live URL", form.liveUrl ?? "", readOnly ? () => {} : set("liveUrl"), "https://…", readOnly)}
+          {field("Loom URL", form.loomUrl ?? "", readOnly ? () => {} : set("loomUrl"), "https://loom.com/share/…", readOnly)}
 
-          {/* Status select */}
-          <div className="flex flex-col gap-1">
-            <label className="text-[11px] text-gray-500 font-medium uppercase tracking-wider">Status</label>
-            <select
-              value={form.status}
-              onChange={(e) => setForm((f) => ({ ...f, status: e.target.value as Status }))}
-              className="bg-[#1a1a22] border border-[#2e2e3a] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#4a4a60] transition-colors"
-            >
-              {STATUS_ORDER.map((s) => (
-                <option key={s} value={s}>{STATUS_LABELS[s]}</option>
-              ))}
-            </select>
-          </div>
+          {/* Status — always read-only for GitHub entries */}
+          {!readOnly && (
+            <div className="flex flex-col gap-1">
+              <label className="text-[11px] text-gray-500 font-medium uppercase tracking-wider">Status</label>
+              <select
+                value={form.status}
+                onChange={(e) => setForm((f) => ({ ...f, status: e.target.value as Status }))}
+                className="bg-[#1a1a22] border border-[#2e2e3a] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#4a4a60] transition-colors"
+              >
+                {STATUS_ORDER.map((s) => (
+                  <option key={s} value={s}>{STATUS_LABELS[s]}</option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
 
         {/* Actions */}
         <div className="flex items-center justify-between pt-1">
-          {!isNew && onDelete ? (
+          {!isNew && !readOnly && onDelete ? (
             <button
               onClick={() => { onDelete(member!.id); onClose(); }}
               className="text-xs text-red-400/70 hover:text-red-400 transition-colors"
@@ -123,15 +135,17 @@ export default function MemberModal({ member, onSave, onDelete, onClose }: Membe
           ) : <span />}
           <div className="flex gap-2">
             <button onClick={onClose} className="px-4 py-1.5 rounded-lg text-sm text-gray-400 hover:text-gray-200 transition-colors">
-              Cancel
+              {readOnly ? "Close" : "Cancel"}
             </button>
-            <button
-              onClick={handleSave}
-              disabled={!form.name.trim()}
-              className="px-4 py-1.5 rounded-lg text-sm bg-white text-black font-medium hover:bg-gray-200 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              Save
-            </button>
+            {!readOnly && (
+              <button
+                onClick={handleSave}
+                disabled={!form.name.trim()}
+                className="px-4 py-1.5 rounded-lg text-sm bg-white text-black font-medium hover:bg-gray-200 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Save
+              </button>
+            )}
           </div>
         </div>
       </div>
