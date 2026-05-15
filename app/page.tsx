@@ -71,8 +71,8 @@ export default function Home() {
   const members: Member[] = [...ghMembers.filter((m) => m.week === activeWeek), ...filteredLocal];
 
   const week = WEEKS.find((w) => w.id === activeWeek)!;
-  const submitted  = members.filter((m) => m.status === "submitted" || m.status === "pr_open").length;
-  const inProgress = members.filter((m) => m.status === "in_progress").length;
+  const submitted = members.filter((m) => m.status === "submitted" || m.status === "pr_open").length;
+  const notStarted = members.filter((m) => m.status === "not_started").length;
 
   // ── Save / delete (local only) ───────────────────────────────────────────────
   function handleSave(updated: Member) {
@@ -131,7 +131,7 @@ export default function Home() {
             <div className="flex items-center gap-3 text-xs text-gray-500">
               <span><span className="text-white font-semibold">{submitted}</span> submitted</span>
               <span className="text-gray-700">·</span>
-              <span><span className="text-white font-semibold">{inProgress}</span> in progress</span>
+              <span><span className="text-white font-semibold">{notStarted}</span> not started</span>
               <span className="text-gray-700">·</span>
               <span><span className="text-white font-semibold">{members.length}</span> total</span>
             </div>

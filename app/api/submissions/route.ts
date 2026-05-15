@@ -71,17 +71,21 @@ export async function GET(req: NextRequest) {
     const contentsRes = await fetch(contentsUrl, { headers, next: { revalidate } });
 
     if (!contentsRes.ok) {
-      // Branch or path doesn't exist yet — return open-PR stubs only
-      const stubMembers: Member[] = prs.map((pr, i) => {
-        const handle = handleFromBranch(pr.head.ref) ?? pr.user.login;
-        return {
-          id: `gh-pr-${i}`,
-          name: handle,
-          githubHandle: handle,
-          status: "pr_open" as Status,
-          week,
-        };
-      });
+      // Branch or path doesn't exist yet — return open-PR stubs only (with resolved names)
+      const stubMembers = await Promise.all(
+        prs.map(async (pr, i) => {
+          const handle = handleFromBranch(pr.head.ref) ?? pr.user.login;
+          let displayName = handle;
+          try {
+            const userRes = await fetch(`https://api.github.com/users/${handle}`, { headers, next: { revalidate } });
+            if (userRes.ok) {
+              const userData = await userRes.json();
+              if (userData.name) displayName = userData.name;
+            }
+          } catch { /* fall back */ }
+          return { id: `gh-pr-${i}`, name: displayName, githubHandle: handle, status: "pr_open" as Status, week };
+        })
+      );
       return NextResponse.json({ members: stubMembers });
     }
 
@@ -120,17 +124,37 @@ export async function GET(req: NextRequest) {
 
     // ── 4. Add PR-only stubs for open PRs whose file isn't merged yet ────────
     const mergedHandles = new Set(members.map((m) => m.githubHandle.toLowerCase()));
-    prs.forEach((pr, i) => {
-      const handle = handleFromBranch(pr.head.ref) ?? pr.user.login;
-      if (!mergedHandles.has(handle.toLowerCase())) {
-        members.push({
+    const prStubs = prs
+      .map((pr) => handleFromBranch(pr.head.ref) ?? pr.user.login)
+      .filter((handle) => !mergedHandles.has(handle.toLowerCase()));
+
+    // Resolve real display names from GitHub user profiles (best-effort)
+    const resolvedStubs = await Promise.allSettled(
+      prStubs.map(async (handle, i) => {
+        let displayName = handle;
+        try {
+          const userRes = await fetch(
+            `https://api.github.com/users/${handle}`,
+            { headers, next: { revalidate } }
+          );
+          if (userRes.ok) {
+            const userData = await userRes.json();
+            if (userData.name) displayName = userData.name;
+          }
+        } catch { /* fall back to handle */ }
+
+        return {
           id: `gh-pr-${i}`,
-          name: handle,
+          name: displayName,
           githubHandle: handle,
-          status: "pr_open",
+          status: "pr_open" as Status,
           week,
-        });
-      }
+        } satisfies Member;
+      })
+    );
+
+    resolvedStubs.forEach((r) => {
+      if (r.status === "fulfilled") members.push(r.value);
     });
 
     return NextResponse.json({ members, fetchedAt: new Date().toISOString() });
