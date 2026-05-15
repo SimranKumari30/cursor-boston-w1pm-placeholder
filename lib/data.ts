@@ -17,6 +17,15 @@ export interface Week {
   label: string;
   track: string;
   deadline: string;
+  deadlineDate: string; // ISO date string for comparison e.g. "2026-05-16"
+}
+
+export type WeekState = "past" | "live" | "upcoming";
+
+export function weekState(week: Week, liveWeekId: number): WeekState {
+  if (week.id < liveWeekId) return "past";
+  if (week.id === liveWeekId) return "live";
+  return "upcoming";
 }
 
 export interface WeekConfig {
@@ -36,12 +45,12 @@ export const WEEK_CONFIG: Record<number, WeekConfig> = {
 export const UPSTREAM_REPO = "rogerSuperBuilderAlpha/cursor-boston";
 
 export const WEEKS: Week[] = [
-  { id: 1, label: "Week 1 · PM tool",   track: "PM tool build",    deadline: "Fri May 16 · 5pm EST" },
-  { id: 2, label: "Week 2 · Comms",     track: "Comms tool",       deadline: "Fri May 23 · 5pm EST" },
-  { id: 3, label: "Week 3 · Mkt",       track: "Marketing tool",   deadline: "Fri May 30 · 5pm EST" },
-  { id: 4, label: "Week 4 · Edu",       track: "Education tool",   deadline: "Fri Jun  6 · 5pm EST" },
-  { id: 5, label: "Week 5 · Startup",   track: "Startup tool",     deadline: "Fri Jun 13 · 5pm EST" },
-  { id: 6, label: "Week 6 · OSS",       track: "OSS tool",         deadline: "Fri Jun 20 · 5pm EST" },
+  { id: 1, label: "Week 1 · PM tool",  track: "PM tool build",   deadline: "Fri May 16 · 5pm EST",  deadlineDate: "2026-05-16" },
+  { id: 2, label: "Week 2 · Comms",    track: "Comms tool",      deadline: "Fri May 23 · 5pm EST",  deadlineDate: "2026-05-23" },
+  { id: 3, label: "Week 3 · Mkt",      track: "Marketing tool",  deadline: "Fri May 30 · 5pm EST",  deadlineDate: "2026-05-30" },
+  { id: 4, label: "Week 4 · Edu",      track: "Education tool",  deadline: "Fri Jun  6 · 5pm EST",  deadlineDate: "2026-06-06" },
+  { id: 5, label: "Week 5 · Startup",  track: "Startup tool",    deadline: "Fri Jun 13 · 5pm EST",  deadlineDate: "2026-06-13" },
+  { id: 6, label: "Week 6 · OSS",      track: "OSS tool",        deadline: "Fri Jun 20 · 5pm EST",  deadlineDate: "2026-06-20" },
 ];
 
 export const SEED_MEMBERS: Member[] = [

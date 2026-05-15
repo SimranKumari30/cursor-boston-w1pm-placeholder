@@ -1,6 +1,6 @@
 "use client";
 
-import { Week } from "@/lib/data";
+import { Week, weekState } from "@/lib/data";
 
 export type NavItem = "Board" | "Members" | "Tracker";
 
@@ -20,12 +20,7 @@ const NAV_ITEMS: { id: NavItem; icon: string }[] = [
 ];
 
 export default function Sidebar({
-  weeks,
-  activeWeek,
-  onWeekChange,
-  activeNav,
-  onNavChange,
-  liveWeek,
+  weeks, activeWeek, onWeekChange, activeNav, onNavChange, liveWeek,
 }: SidebarProps) {
   return (
     <div className="w-56 flex-shrink-0 flex flex-col bg-[#111114] border-r border-[#1e1e24] h-full">
@@ -58,24 +53,42 @@ export default function Sidebar({
         <p className="text-[10px] text-gray-600 font-semibold uppercase tracking-widest px-3 mb-2">
           Weeks
         </p>
-        {weeks.map((week) => (
-          <button
-            key={week.id}
-            onClick={() => onWeekChange(week.id)}
-            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${
-              activeWeek === week.id
-                ? "bg-[#2a2a38] text-white font-medium"
-                : "text-gray-500 hover:text-gray-300 hover:bg-[#1e1e28]"
-            }`}
-          >
-            <span>{week.label}</span>
-            {week.id === liveWeek && (
-              <span className="text-[9px] bg-red-500/20 text-red-400 border border-red-500/30 px-1.5 py-0.5 rounded font-semibold tracking-wide">
-                live
-              </span>
-            )}
-          </button>
-        ))}
+        {weeks.map((week) => {
+          const state   = weekState(week, liveWeek);
+          const isActive = activeWeek === week.id;
+
+          const baseText =
+            isActive
+              ? "text-white font-medium"
+              : state === "past"
+              ? "text-gray-600 hover:text-gray-400"
+              : state === "upcoming"
+              ? "text-gray-600 hover:text-gray-400"
+              : "text-gray-400 hover:text-gray-200";
+
+          return (
+            <button
+              key={week.id}
+              onClick={() => onWeekChange(week.id)}
+              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${baseText} ${
+                isActive ? "bg-[#2a2a38]" : "hover:bg-[#1e1e28]"
+              }`}
+            >
+              <span className="truncate">{week.label}</span>
+              {state === "live" && (
+                <span className="ml-1.5 text-[9px] bg-red-500/20 text-red-400 border border-red-500/30 px-1.5 py-0.5 rounded font-semibold tracking-wide flex-shrink-0">
+                  live
+                </span>
+              )}
+              {state === "past" && (
+                <span className="ml-1.5 text-[9px] text-gray-700 flex-shrink-0">done</span>
+              )}
+              {state === "upcoming" && (
+                <span className="ml-1.5 text-[9px] text-gray-700 flex-shrink-0">soon</span>
+              )}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
