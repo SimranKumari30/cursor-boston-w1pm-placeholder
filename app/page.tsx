@@ -9,8 +9,19 @@ import MemberModal from "@/components/MemberModal";
 import MembersView from "@/components/MembersView";
 import TrackerView from "@/components/TrackerView";
 
-const LIVE_WEEK = 1;
 const POLL_INTERVAL_MS = 60_000;
+
+/** Determine the current live week from deadlines, so this never needs a code change. */
+function computeLiveWeek(): number {
+  const now = new Date();
+  for (const week of WEEKS) {
+    const deadline = new Date(`${week.deadlineDate}T17:00:00-05:00`);
+    if (now <= deadline) return week.id;
+  }
+  return WEEKS[WEEKS.length - 1].id;
+}
+
+const LIVE_WEEK = computeLiveWeek();
 
 export default function Home() {
   const [activeWeek, setActiveWeek] = useState(LIVE_WEEK);

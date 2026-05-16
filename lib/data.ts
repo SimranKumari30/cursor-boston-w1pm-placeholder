@@ -57,18 +57,6 @@ export const WEEKS: Week[] = [
   { id: 6, label: "Week 6 · OSS",      track: "OSS tool",        deadline: "Fri Jun 20 · 5pm EST",  deadlineDate: "2026-06-20" },
 ];
 
-export const SEED_MEMBERS: Member[] = [
-  { id: "1", name: "Person 1",  githubHandle: "person1",  pitch: "A kanban board that auto-syncs with GitHub PRs.",         repoUrl: "https://github.com/person1/repo",  liveUrl: "https://person1.vercel.app", loomUrl: "https://loom.com/share/abc1", status: "submitted",   week: 1 },
-  { id: "2", name: "Person 2",  githubHandle: "person2",  pitch: "Kanban for shipping at the speed of thought.",            repoUrl: "https://github.com/person2/repo",  liveUrl: "https://person2.vercel.app", loomUrl: undefined,                    status: "in_progress", week: 1 },
-  { id: "3", name: "Person 3",  githubHandle: "person3",  pitch: "One-click PM with seamless context switching.",           repoUrl: "https://github.com/person3/repo",  liveUrl: undefined,                    loomUrl: undefined,                    status: "in_progress", week: 1 },
-  { id: "4", name: "Person 4",  githubHandle: "person4",  pitch: "Visual sprint planner with AI suggestions.",              repoUrl: "https://github.com/person4/repo",  liveUrl: "https://person4.vercel.app", loomUrl: "https://loom.com/share/abc4", status: "submitted",   week: 1 },
-  { id: "5", name: "Person 5",  githubHandle: "person5",  pitch: "Drag-and-drop task manager built for async teams.",       repoUrl: "https://github.com/person5/repo",  liveUrl: "https://person5.vercel.app", loomUrl: "https://loom.com/share/abc5", status: "submitted",   week: 1 },
-  { id: "6", name: "Person 6",  githubHandle: "person6",  pitch: undefined,                                                 repoUrl: undefined,                          liveUrl: undefined,                    loomUrl: undefined,                    status: "not_started", week: 1 },
-  { id: "7", name: "Person 7",  githubHandle: "person7",  pitch: undefined,                                                 repoUrl: undefined,                          liveUrl: undefined,                    loomUrl: undefined,                    status: "not_started", week: 1 },
-  { id: "8", name: "Person 8",  githubHandle: "person8",  pitch: "Minimal weekly review tracker.",                          repoUrl: "https://github.com/person8/repo",  liveUrl: undefined,                    loomUrl: undefined,                    status: "pr_open",     week: 1 },
-  { id: "9", name: "Person 9",  githubHandle: "person9",  pitch: "Focus timer integrated with your task list.",             repoUrl: "https://github.com/person9/repo",  liveUrl: undefined,                    loomUrl: undefined,                    status: "pr_open",     week: 1 },
-];
-
 export const STATUS_LABELS: Record<Status, string> = {
   not_started: "NOT STARTED",
   in_progress:  "IN PROGRESS",
@@ -105,18 +93,4 @@ export function avatarColor(id: string): string {
   return PALETTE[isNaN(idx) ? 0 : idx];
 }
 
-const STORAGE_KEY = "shiptrack_members";
 
-export function loadMembers(): Member[] {
-  if (typeof window === "undefined") return SEED_MEMBERS;
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw) as Member[];
-  } catch { /* ignore */ }
-  return SEED_MEMBERS;
-}
-
-export function saveMembers(members: Member[]): void {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(members));
-}
