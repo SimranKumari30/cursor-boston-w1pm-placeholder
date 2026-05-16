@@ -217,10 +217,6 @@ export default function Home() {
               <div className="flex items-center gap-4">
                 {members.length > 0 && (
                   <div className="flex items-center gap-3 text-xs text-gray-500">
-                    <span><span className="text-white font-semibold">{submitted}</span> submitted</span>
-                    <span className="text-gray-700">·</span>
-                    <span><span className="text-white font-semibold">{members.length}</span> total</span>
-                    <span className="text-gray-700">·</span>
                     {(() => {
                       const competing = members.filter(
                         (m) => m.competeForWin && m.repoUrl && m.liveUrl && m.loomUrl
@@ -231,6 +227,10 @@ export default function Home() {
                         </span>
                       );
                     })()}
+                    <span className="text-gray-700">·</span>
+                    <span><span className="text-white font-semibold">{submitted}</span> submitted</span>
+                    <span className="text-gray-700">·</span>
+                    <span><span className="text-white font-semibold">{members.length}</span> total</span>
                   </div>
                 )}
                 <button
