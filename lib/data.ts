@@ -64,7 +64,7 @@ export const STATUS_LABELS: Record<Status, string> = {
   pr_open:      "PR OPEN",
 };
 
-export const STATUS_ORDER: Status[] = ["not_started", "submitted", "pr_open"];
+export const STATUS_ORDER: Status[] = ["not_started", "pr_open", "submitted"];
 
 export function getMissingFields(member: Member): string[] {
   const missing: string[] = [];

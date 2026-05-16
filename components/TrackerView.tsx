@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Member, WEEKS, weekState, avatarColor, getInitials } from "@/lib/data";
 
-type CellStatus = "submitted" | "pr_open" | "not_started" | null;
+type CellStatus = "submitted" | "pr_open" | "not_started" | "no_submission" | null;
 
 interface MatrixRow {
   name: string;
@@ -11,10 +11,11 @@ interface MatrixRow {
   cells: CellStatus[];  // one per week (index 0 = week 1)
 }
 
-const CELL_CONFIG: Record<NonNullable<CellStatus>, { label: string; bg: string; text: string }> = {
-  submitted:   { label: "Submitted",   bg: "bg-blue-400/10",  text: "text-blue-400" },
-  pr_open:     { label: "PR Open",     bg: "bg-green-400/10", text: "text-green-400" },
-  not_started: { label: "Not Started", bg: "bg-[#1e1e24]",    text: "text-gray-600" },
+const CELL_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
+  submitted:      { label: "Submitted",     bg: "bg-blue-400/10",  text: "text-blue-400" },
+  pr_open:        { label: "PR Open",       bg: "bg-green-400/10", text: "text-green-400" },
+  not_started:    { label: "Not Started",   bg: "bg-[#1e1e24]",    text: "text-gray-600" },
+  no_submission:  { label: "No Submission", bg: "bg-[#1a1a1e]",    text: "text-gray-700" },
 };
 
 export default function TrackerView() {
@@ -78,9 +79,10 @@ export default function TrackerView() {
         (m) => m.githubHandle.toLowerCase() === key
       );
       if (found) return found.status as CellStatus;
-      // Show "not started" for past and live weeks; null (—) for upcoming
       const wState = weekState(week, liveWeekId);
-      return wState === "upcoming" ? null : "not_started";
+      if (wState === "upcoming") return null;
+      if (wState === "past") return "no_submission" as CellStatus;
+      return "not_started" as CellStatus; // live week
     }),
   }));
 

@@ -17,7 +17,7 @@ export default function MemberCard({ member, onClick }: MemberCardProps) {
     <div
       onClick={onClick}
       className={`rounded-xl p-3 cursor-pointer transition-all ${
-        complete
+        complete && member.status !== "not_started"
           ? "bg-[#1a2a1a] border border-[#2a4a2a] hover:border-[#4ade80]/50"
           : "bg-[#1e1e24] border border-[#2e2e38] hover:border-[#4a4a58]"
       }`}
