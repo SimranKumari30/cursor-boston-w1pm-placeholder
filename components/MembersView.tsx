@@ -3,25 +3,10 @@
 import { useEffect, useState } from "react";
 import { Member, WEEKS, avatarColor, getInitials } from "@/lib/data";
 
-const STATUS_LABEL: Record<string, { label: string; color: string }> = {
-  submitted:   { label: "Submitted",   color: "text-blue-400 bg-blue-400/10 border-blue-400/20" },
-  pr_open:     { label: "PR Open",     color: "text-green-400 bg-green-400/10 border-green-400/20" },
-  not_started: { label: "Not Started", color: "text-gray-500 bg-gray-500/10 border-gray-500/20" },
-};
-
 interface MemberRow {
   name: string;
   githubHandle: string;
   id: string;
-  // best status across all weeks (pr_open > submitted > not_started)
-  bestStatus: string;
-  weeksActive: number;
-}
-
-function bestStatus(statuses: string[]): string {
-  if (statuses.includes("pr_open"))     return "pr_open";
-  if (statuses.includes("submitted"))   return "submitted";
-  return "not_started";
 }
 
 export default function MembersView() {
@@ -41,34 +26,23 @@ export default function MembersView() {
       );
 
       // Deduplicate by githubHandle, collect all statuses across weeks
-      const byHandle = new Map<string, { member: Member; statuses: string[]; weeks: number }>();
+      const byHandle = new Map<string, { member: Member }>();
       results.forEach((weekMembers) => {
         weekMembers.forEach((m) => {
           const key = m.githubHandle.toLowerCase();
-          if (byHandle.has(key)) {
-            const entry = byHandle.get(key)!;
-            entry.statuses.push(m.status);
-            entry.weeks += 1;
-          } else {
-            byHandle.set(key, { member: m, statuses: [m.status], weeks: 1 });
+          if (!byHandle.has(key)) {
+            byHandle.set(key, { member: m });
           }
         });
       });
 
       const sorted = Array.from(byHandle.values())
-        .map(({ member, statuses, weeks }) => ({
+        .map(({ member }) => ({
           name: member.name,
           githubHandle: member.githubHandle,
           id: member.id,
-          bestStatus: bestStatus(statuses),
-          weeksActive: weeks,
         }))
-        // sort: pr_open first, then submitted, then not_started; alpha within group
-        .sort((a, b) => {
-          const order = ["pr_open", "submitted", "not_started"];
-          const diff = order.indexOf(a.bestStatus) - order.indexOf(b.bestStatus);
-          return diff !== 0 ? diff : a.name.localeCompare(b.name);
-        });
+        .sort((a, b) => a.name.localeCompare(b.name));
 
       setRows(sorted);
       setLoading(false);
@@ -107,15 +81,11 @@ export default function MembersView() {
         <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-widest">
           Cohort Members — {rows.length}
         </p>
-        <p className="text-[11px] text-gray-600">
-          {rows.filter(r => r.bestStatus !== "not_started").length} with submissions
-        </p>
       </div>
 
       {rows.map((row) => {
         const initials = getInitials(row.name);
         const color    = avatarColor(row.id);
-        const s        = STATUS_LABEL[row.bestStatus] ?? STATUS_LABEL.not_started;
 
         return (
           <div
@@ -140,14 +110,6 @@ export default function MembersView() {
                 @{row.githubHandle}
               </a>
             </div>
-
-            {row.weeksActive > 1 && (
-              <span className="text-[10px] text-gray-600">{row.weeksActive}w</span>
-            )}
-
-            <span className={`text-[10px] font-medium border px-2 py-0.5 rounded-full ${s.color}`}>
-              {s.label}
-            </span>
           </div>
         );
       })}

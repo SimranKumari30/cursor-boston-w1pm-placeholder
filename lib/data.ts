@@ -50,11 +50,11 @@ export const UPSTREAM_REPO = "rogerSuperBuilderAlpha/cursor-boston";
 
 export const WEEKS: Week[] = [
   { id: 1, label: "Week 1 · PM tool",  track: "PM tool build",   deadline: "Fri May 15 · 5pm EST",  deadlineDate: "2026-05-15" },
-  { id: 2, label: "Week 2 · Comms",    track: "Comms tool",      deadline: "Fri May 23 · 5pm EST",  deadlineDate: "2026-05-23" },
-  { id: 3, label: "Week 3 · Mkt",      track: "Marketing tool",  deadline: "Fri May 30 · 5pm EST",  deadlineDate: "2026-05-30" },
-  { id: 4, label: "Week 4 · Edu",      track: "Education tool",  deadline: "Fri Jun  6 · 5pm EST",  deadlineDate: "2026-06-06" },
-  { id: 5, label: "Week 5 · Startup",  track: "Startup tool",    deadline: "Fri Jun 13 · 5pm EST",  deadlineDate: "2026-06-13" },
-  { id: 6, label: "Week 6 · OSS",      track: "OSS tool",        deadline: "Fri Jun 20 · 5pm EST",  deadlineDate: "2026-06-20" },
+  { id: 2, label: "Week 2 · Comms",    track: "Comms tool",      deadline: "Fri May 22 · 5pm EST",  deadlineDate: "2026-05-22" },
+  { id: 3, label: "Week 3 · Mkt",      track: "Marketing tool",  deadline: "Fri May 29 · 5pm EST",  deadlineDate: "2026-05-29" },
+  { id: 4, label: "Week 4 · Edu",      track: "Education tool",  deadline: "Fri Jun  5 · 5pm EST",  deadlineDate: "2026-06-05" },
+  { id: 5, label: "Week 5 · Startup",  track: "Startup tool",    deadline: "Fri Jun 12 · 5pm EST",  deadlineDate: "2026-06-12" },
+  { id: 6, label: "Week 6 · OSS",      track: "OSS tool",        deadline: "Fri Jun 19 · 5pm EST",  deadlineDate: "2026-06-19" },
 ];
 
 export const STATUS_LABELS: Record<Status, string> = {
