@@ -9,8 +9,8 @@ interface SidebarProps {
 
 const NAV_ITEMS: { id: NavItem; icon: string }[] = [
   { id: "Board",   icon: "⊞" },
-  { id: "Members", icon: "⊟" },
   { id: "Tracker", icon: "⊠" },
+  { id: "Members", icon: "⊟" },
 ];
 
 export default function Sidebar({ activeNav, onNavChange }: SidebarProps) {

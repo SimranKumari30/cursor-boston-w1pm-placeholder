@@ -270,9 +270,12 @@ export default function Home() {
           <>
             <div className="flex items-center justify-between px-6 py-4 border-b border-[#1e1e24] flex-shrink-0">
               <div>
-                <h1 className="text-lg font-bold text-white">Members</h1>
+                <div className="flex items-center gap-2">
+                  <h1 className="text-lg font-bold text-white">{liveWeek.track}</h1>
+                  <span className="text-[9px] bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded font-semibold tracking-wide">live</span>
+                </div>
                 <p className="text-xs text-gray-500 mt-0.5">
-                  {liveWeek.track} · {liveWeek.deadline} deadline
+                  Week {liveWeek.id} of {WEEKS.length} · {liveWeek.deadline} deadline
                 </p>
               </div>
               <div className="flex items-center gap-3">
@@ -288,9 +291,12 @@ export default function Home() {
           <>
             <div className="flex items-center justify-between px-6 py-4 border-b border-[#1e1e24] flex-shrink-0">
               <div>
-                <h1 className="text-lg font-bold text-white">Tracker</h1>
+                <div className="flex items-center gap-2">
+                  <h1 className="text-lg font-bold text-white">{liveWeek.track}</h1>
+                  <span className="text-[9px] bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded font-semibold tracking-wide">live</span>
+                </div>
                 <p className="text-xs text-gray-500 mt-0.5">
-                  {liveWeek.track} · {liveWeek.deadline} deadline
+                  Week {liveWeek.id} of {WEEKS.length} · {liveWeek.deadline} deadline
                 </p>
               </div>
               <div className="flex items-center gap-3">
