@@ -82,9 +82,9 @@ export default function TrackerView() {
       const wState = weekState(week, liveWeekId);
       if (wState === "upcoming") return null;
       if (wState === "past") return "no_submission" as CellStatus;
-      return "not_started" as CellStatus; // live week
+      return "not_started" as CellStatus;
     }),
-  }));
+  })).sort((a, b) => a.name.localeCompare(b.name));
 
   const totalSubmitted = allMembers.flat().filter(
     (m) => m.status === "submitted" || m.status === "pr_open"
