@@ -10,7 +10,7 @@ interface MemberCardProps {
 export default function MemberCard({ member, onClick }: MemberCardProps) {
   const missing = getMissingFields(member);
   const complete = isComplete(member);
-  const competing = member.competeForWin === true && member.status !== "not_started";
+  const competing = member.competeForWin === true && isComplete(member) && member.status !== "not_started";
   const initials = getInitials(member.name);
   const color = avatarColor(member.id);
 
