@@ -220,16 +220,14 @@ export default function Home() {
                     <span><span className="text-white font-semibold">{submitted}</span> submitted</span>
                     <span className="text-gray-700">·</span>
                     <span><span className="text-white font-semibold">{members.length}</span> total</span>
+                    <span className="text-gray-700">·</span>
                     {(() => {
                       const competing = members.filter(
                         (m) => m.competeForWin && m.repoUrl && m.liveUrl && m.loomUrl
                       ).length;
-                      return competing > 0 ? (
-                        <>
-                          <span className="text-gray-700">·</span>
-                          <span><span className="text-green-400 font-semibold">{competing}</span> trying to win</span>
-                        </>
-                      ) : null;
+                      return (
+                        <span><span className="text-green-400 font-semibold">{competing}</span> trying to win</span>
+                      );
                     })()}
                   </div>
                 )}
