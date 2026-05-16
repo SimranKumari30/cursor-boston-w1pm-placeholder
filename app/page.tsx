@@ -43,6 +43,7 @@ export default function Home() {
   const [activeWeek, setActiveWeek]   = useState(LIVE_WEEK);
   const [activeNav, setActiveNav]     = useState<NavItem>("Board");
   const [ghMembers, setGhMembers]     = useState<Member[]>([]);
+  const [cohortBase, setCohortBase]   = useState<Member[]>([]); // week-1 roster as "not started" seed
   const [localMembers, setLocalMembers] = useState<Member[]>([]);
   const [loading, setLoading]         = useState(false);
   const [lastFetched, setLastFetched] = useState<Date | null>(null);
@@ -78,6 +79,14 @@ export default function Home() {
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [activeWeek, fetchFromGitHub]);
 
+  // Fetch Week 1 roster once as the cohort baseline
+  useEffect(() => {
+    fetch("/api/submissions?week=1")
+      .then((r) => r.ok ? r.json() : { members: [] })
+      .then((d) => setCohortBase((d.members as Member[]) ?? []))
+      .catch(() => {});
+  }, []);
+
   // ── Local members ─────────────────────────────────────────────────────────
   useEffect(() => {
     try {
@@ -96,7 +105,20 @@ export default function Home() {
   const filteredLocal = localMembers.filter(
     (m) => m.week === activeWeek && !ghHandles.has(m.githubHandle.toLowerCase())
   );
-  const members  = [...ghMembers.filter((m) => m.week === activeWeek), ...filteredLocal];
+  const weekGhMembers = ghMembers.filter((m) => m.week === activeWeek);
+
+  // For weeks 2+, seed "not started" from the Week 1 cohort for anyone not yet active
+  const activeHandles = new Set([
+    ...weekGhMembers.map((m) => m.githubHandle.toLowerCase()),
+    ...filteredLocal.map((m) => m.githubHandle.toLowerCase()),
+  ]);
+  const notStartedSeeds: Member[] = activeWeek > 1
+    ? cohortBase
+        .filter((m) => !activeHandles.has(m.githubHandle.toLowerCase()))
+        .map((m) => ({ ...m, status: "not_started" as const, week: activeWeek, id: `ns-${m.githubHandle}` }))
+    : [];
+
+  const members = [...weekGhMembers, ...filteredLocal, ...notStartedSeeds];
   const week     = WEEKS.find((w) => w.id === activeWeek)!;
   const wState   = weekState(week, LIVE_WEEK);
   const submitted = members.filter((m) => m.status === "submitted" || m.status === "pr_open").length;
