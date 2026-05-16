@@ -11,7 +11,7 @@ interface WeekBarProps {
 
 export default function WeekBar({ weeks, activeWeek, onWeekChange, liveWeek }: WeekBarProps) {
   return (
-    <div className="flex items-center gap-1 px-6 py-2 border-b border-[#1e1e24] overflow-x-auto flex-shrink-0">
+    <div className="flex items-center justify-center gap-1 px-6 py-2 border-b border-[#1e1e24] overflow-x-auto flex-shrink-0">
       {weeks.map((week) => {
         const state    = weekState(week, liveWeek);
         const isActive = activeWeek === week.id;

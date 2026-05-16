@@ -226,7 +226,9 @@ export default function Home() {
                         (m) => m.competeForWin && m.repoUrl && m.liveUrl && m.loomUrl
                       ).length;
                       return (
-                        <span><span className="text-green-400 font-semibold">{competing}</span> trying to win</span>
+                        <span className={competing === 0 ? "invisible" : ""}>
+                          <span className="text-green-400 font-semibold">{competing}</span> trying to win
+                        </span>
                       );
                     })()}
                   </div>
@@ -244,7 +246,7 @@ export default function Home() {
                   {loading ? "syncing…" : lastFetched ? relTime(lastFetched) : "sync"}
                 </button>
                 {CountdownBadge && (
-                  <div className={wState !== "live" ? "opacity-40" : ""}>
+                  <div className={wState === "past" ? "invisible" : ""}>
                     {CountdownBadge}
                   </div>
                 )}
