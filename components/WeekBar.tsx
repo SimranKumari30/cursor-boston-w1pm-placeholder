@@ -15,18 +15,19 @@ export default function WeekBar({ weeks, activeWeek, onWeekChange, liveWeek }: W
       {weeks.map((week) => {
         const state    = weekState(week, liveWeek);
         const isActive = activeWeek === week.id;
+        const blocked  = state === "upcoming";
 
         return (
           <button
             key={week.id}
-            onClick={() => state === "live" && onWeekChange(week.id)}
-            disabled={state !== "live"}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs whitespace-nowrap flex-shrink-0 ${
-              state === "live"
-                ? isActive
-                  ? "bg-[#2a2a38] text-white font-medium cursor-pointer"
-                  : "text-gray-400 hover:text-white hover:bg-[#1e1e28] cursor-pointer transition-colors"
-                : "text-gray-700 cursor-not-allowed"
+            onClick={() => !blocked && onWeekChange(week.id)}
+            disabled={blocked}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs whitespace-nowrap flex-shrink-0 transition-colors ${
+              blocked
+                ? "text-gray-700 cursor-not-allowed"
+                : isActive
+                ? "bg-[#2a2a38] text-white font-medium cursor-pointer"
+                : "text-gray-400 hover:text-white hover:bg-[#1e1e28] cursor-pointer"
             }`}
           >
             {week.label}
@@ -36,7 +37,7 @@ export default function WeekBar({ weeks, activeWeek, onWeekChange, liveWeek }: W
               </span>
             )}
             {state === "past" && (
-              <span className="text-[8px] text-gray-700">done</span>
+              <span className="text-[8px] text-gray-600">done</span>
             )}
             {state === "upcoming" && (
               <span className="text-[8px] text-gray-700">soon</span>

@@ -288,7 +288,7 @@ export default function Home() {
             )}
           </div>
         )}
-        {activeNav === "Members" && <MembersView members={members} />}
+        {activeNav === "Members" && <MembersView />}
         {activeNav === "Tracker" && <TrackerView />}
       </div>
 
