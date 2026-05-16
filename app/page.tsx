@@ -222,7 +222,7 @@ export default function Home() {
                         (m) => m.competeForWin && m.repoUrl && m.liveUrl && m.loomUrl
                       ).length;
                       return (
-                        <span className={competing === 0 ? "invisible" : ""}>
+                        <span className={competing === 0 ? "opacity-40" : ""}>
                           <span className="text-green-400 font-semibold">{competing}</span> trying to win
                         </span>
                       );
