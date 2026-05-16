@@ -22,23 +22,18 @@ export default function MemberCard({ member, onClick }: MemberCardProps) {
           : "bg-[#1e1e24] border border-[#2e2e38] hover:border-[#4a4a58]"
       }`}
     >
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-2">
         <div
-          className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-semibold flex-shrink-0"
+          className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[9px] font-semibold flex-shrink-0 mt-0.5"
           style={{ backgroundColor: color }}
         >
           {initials}
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-white truncate">{member.name}</span>
-            {complete && <span className="w-2 h-2 rounded-full bg-green-400 flex-shrink-0" />}
+          <div className="flex items-start gap-1.5">
+            <span className="text-sm font-medium text-white leading-snug">{member.name}</span>
+            {complete && <span className="w-1.5 h-1.5 rounded-full bg-green-400 flex-shrink-0 mt-1.5" />}
           </div>
-          {member.pitch ? (
-            <p className="text-xs text-gray-400 mt-0.5 line-clamp-2">{member.pitch}</p>
-          ) : (
-            <p className="text-xs text-gray-600 mt-0.5 italic">No pitch yet</p>
-          )}
         </div>
         {/* GitHub source link */}
         {(member.prUrl || member.submissionUrl) && (
@@ -57,7 +52,7 @@ export default function MemberCard({ member, onClick }: MemberCardProps) {
 
       {/* Missing field pills */}
       {missing.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 mt-2.5">
+        <div className="flex flex-wrap gap-1.5 mt-2">
           {missing.map((field) => (
             <span key={field} className="text-[10px] text-gray-500 bg-[#2a2a35] px-2 py-0.5 rounded-full">
               {field} missing
@@ -68,7 +63,7 @@ export default function MemberCard({ member, onClick }: MemberCardProps) {
 
       {/* Complete — show clickable field links */}
       {complete && (
-        <div className="flex gap-1.5 mt-2.5 flex-wrap">
+        <div className="flex gap-1.5 mt-2 flex-wrap">
           {member.repoUrl && (
             <a href={member.repoUrl} target="_blank" rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
