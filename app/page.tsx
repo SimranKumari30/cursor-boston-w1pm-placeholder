@@ -115,7 +115,13 @@ export default function Home() {
   const notStartedSeeds: Member[] = activeWeek > 1
     ? cohortBase
         .filter((m) => !activeHandles.has(m.githubHandle.toLowerCase()))
-        .map((m) => ({ ...m, status: "not_started" as const, week: activeWeek, id: `ns-${m.githubHandle}` }))
+        .map((m) => ({
+          id: `ns-${m.githubHandle}`,
+          name: m.name,
+          githubHandle: m.githubHandle,
+          status: "not_started" as const,
+          week: activeWeek,
+        }))
     : [];
 
   const members = [...weekGhMembers, ...filteredLocal, ...notStartedSeeds];
