@@ -23,12 +23,12 @@ export default function KanbanBoard({ members, onEdit, loading }: KanbanBoardPro
   );
 
   return (
-    <div className="flex gap-4 h-full overflow-x-auto">
+    <div className="flex gap-3 h-full overflow-x-auto p-3 rounded-2xl border border-[#2e2e38]">
       {STATUS_ORDER.map((status) => {
         const cards = grouped[status];
         return (
-          <div key={status} className="flex-1 min-w-[200px] min-h-0 flex flex-col gap-3">
-            <div className="flex items-center gap-2 px-1 flex-shrink-0">
+          <div key={status} className="flex-1 min-w-[200px] min-h-0 flex flex-col gap-3 border border-[#2e2e38] rounded-xl p-3">
+            <div className="flex items-center gap-2 flex-shrink-0">
               <span className={`text-[11px] font-semibold tracking-widest uppercase ${COLUMN_ACCENT[status]}`}>
                 {STATUS_LABELS[status]}
               </span>
