@@ -234,33 +234,7 @@ export default function Home() {
 
             {/* Board content */}
             <div className="flex-1 min-h-0 overflow-hidden px-6 py-5" style={{ minWidth: "680px" }}>
-              {loading && members.length === 0 ? (
-                <div className="flex gap-4 h-full">
-                  {[0,1,2].map((i) => (
-                    <div key={i} className="flex-1 min-w-[200px]">
-                      <div className="h-3 w-24 bg-[#1e1e28] rounded mb-4" />
-                      {[0,1].map((j) => (
-                        <div key={j} className="bg-[#1e1e24] border border-[#2e2e38] rounded-xl p-3 mb-2.5 h-20 animate-pulse" />
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              ) : !loading && members.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full gap-3 text-center">
-                  <p className="text-gray-500 text-sm font-medium">
-                    {wState === "upcoming"
-                      ? "No submissions yet — this week hasn't started."
-                      : wState === "past"
-                      ? "No submissions were recorded for this week."
-                      : "No submissions yet."}
-                  </p>
-                  <p className="text-gray-700 text-xs">
-                    {wState === "upcoming" ? `Opens after Week ${LIVE_WEEK} closes.` : "Check back after the deadline."}
-                  </p>
-                </div>
-              ) : (
-                <KanbanBoard members={members} onEdit={(m) => setEditTarget(m)} />
-              )}
+              <KanbanBoard members={members} onEdit={(m) => setEditTarget(m)} loading={loading} />
             </div>
           </>
         )}
