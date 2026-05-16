@@ -44,8 +44,8 @@ export default function MemberCard({ member, onClick }: MemberCardProps) {
             </p>
           )}
         </div>
-        {/* GitHub source link */}
-        {(member.prUrl || member.submissionUrl) && (
+        {/* GitHub source link — only for active submissions */}
+        {member.status !== "not_started" && (member.prUrl || member.submissionUrl) && (
           <a
             href={member.prUrl ?? member.submissionUrl}
             target="_blank"
