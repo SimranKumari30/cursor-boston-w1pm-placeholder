@@ -215,6 +215,11 @@ export default function Home() {
               </div>
 
               <div className="flex items-center gap-4">
+                {CountdownBadge && (
+                  <div className={wState === "past" ? "invisible" : ""}>
+                    {CountdownBadge}
+                  </div>
+                )}
                 {members.length > 0 && (
                   <div className="flex items-center gap-3 text-xs text-gray-500">
                     {(() => {
@@ -243,11 +248,6 @@ export default function Home() {
                   </svg>
                   {loading ? "syncing…" : lastFetched ? relTime(lastFetched) : "sync"}
                 </button>
-                {CountdownBadge && (
-                  <div className={wState === "past" ? "invisible" : ""}>
-                    {CountdownBadge}
-                  </div>
-                )}
                 <button
                   onClick={() => setEditTarget("new")}
                   className="bg-white text-black text-sm font-medium px-4 py-1.5 rounded-lg hover:bg-gray-200 transition-colors"
