@@ -8,6 +8,7 @@ interface GhSubmission {
   liveUrl?: string;
   pitch?: string;
   loomUrl?: string;
+  competeForWin?: boolean;
 }
 
 interface GhFile {
@@ -146,6 +147,7 @@ export async function GET(req: NextRequest) {
           prUrl: pr?.url,
           submissionUrl: fileUrl,
           submittedAt,
+          competeForWin: data.competeForWin === true,
         };
         return member;
       })

@@ -16,6 +16,8 @@ export interface Member {
   submissionUrl?: string;
   /** ISO timestamp when the submission was made or PR was opened */
   submittedAt?: string;
+  /** True if the member opted in to compete for the win */
+  competeForWin?: boolean;
 }
 
 export interface Week {

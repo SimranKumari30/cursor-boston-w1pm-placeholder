@@ -10,6 +10,7 @@ interface MemberCardProps {
 export default function MemberCard({ member, onClick }: MemberCardProps) {
   const missing = getMissingFields(member);
   const complete = isComplete(member);
+  const competing = member.competeForWin === true && member.status !== "not_started";
   const initials = getInitials(member.name);
   const color = avatarColor(member.id);
 
@@ -17,7 +18,7 @@ export default function MemberCard({ member, onClick }: MemberCardProps) {
     <div
       onClick={onClick}
       className={`rounded-xl p-3 cursor-pointer transition-all ${
-        complete && member.status !== "not_started"
+        competing
           ? "bg-[#1a2a1a] border border-[#2a4a2a] hover:border-[#4ade80]/50"
           : "bg-[#1e1e24] border border-[#2e2e38] hover:border-[#4a4a58]"
       }`}
@@ -32,7 +33,7 @@ export default function MemberCard({ member, onClick }: MemberCardProps) {
         <div className="flex-1 min-w-0">
           <div className="flex items-start gap-1.5">
             <span className="text-sm font-medium text-white leading-snug">{member.name}</span>
-            {complete && member.status !== "not_started" && <span className="w-1.5 h-1.5 rounded-full bg-green-400 flex-shrink-0 mt-1.5" />}
+            {competing && <span className="w-1.5 h-1.5 rounded-full bg-green-400 flex-shrink-0 mt-1.5" />}
           </div>
           {member.submittedAt && member.status !== "not_started" && (
             <p className="text-[10px] text-gray-600 mt-0.5">
