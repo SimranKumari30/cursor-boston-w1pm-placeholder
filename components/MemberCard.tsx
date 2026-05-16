@@ -34,6 +34,14 @@ export default function MemberCard({ member, onClick }: MemberCardProps) {
             <span className="text-sm font-medium text-white leading-snug">{member.name}</span>
             {complete && member.status !== "not_started" && <span className="w-1.5 h-1.5 rounded-full bg-green-400 flex-shrink-0 mt-1.5" />}
           </div>
+          {member.submittedAt && member.status !== "not_started" && (
+            <p className="text-[10px] text-gray-600 mt-0.5">
+              {new Date(member.submittedAt).toLocaleString("en-US", {
+                month: "short", day: "numeric",
+                hour: "numeric", minute: "2-digit", hour12: true,
+              })}
+            </p>
+          )}
         </div>
         {/* GitHub source link */}
         {(member.prUrl || member.submissionUrl) && (

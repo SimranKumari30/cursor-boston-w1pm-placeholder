@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { WEEK_CONFIG, UPSTREAM_REPO, Member, Status } from "@/lib/data";
 
-// GitHub submission JSON shape
 interface GhSubmission {
   githubHandle: string;
   name?: string;
@@ -11,19 +10,22 @@ interface GhSubmission {
   loomUrl?: string;
 }
 
-// GitHub Contents API file entry
 interface GhFile {
   name: string;
   download_url: string;
   sha: string;
 }
 
-// GitHub PR shape (abbreviated)
 interface GhPR {
   number: number;
   html_url: string;
+  created_at: string;
   head: { ref: string };
   user: { login: string };
+}
+
+interface GhCommit {
+  commit: { author: { date: string } };
 }
 
 function ghHeaders(): HeadersInit {
@@ -37,7 +39,6 @@ function ghHeaders(): HeadersInit {
   return h;
 }
 
-/** Extract a githubHandle from a branch like submit-SimranKumari30-w1pm */
 function handleFromBranch(ref: string): string | null {
   const m = ref.match(/^submit-(.+?)(?:-w\d|$)/i);
   return m ? m[1].toLowerCase() : null;
@@ -53,31 +54,29 @@ export async function GET(req: NextRequest) {
   }
 
   const headers = ghHeaders();
-  const revalidate = 60; // cache for 60 s on the server
+  const revalidate = 60;
 
   try {
-    // ── 1. Fetch open PRs targeting this week's branch ──────────────────────
+    // ── 1. Fetch open PRs ────────────────────────────────────────────────────
     const prsUrl = `https://api.github.com/repos/${UPSTREAM_REPO}/pulls?base=${config.branch}&state=open&per_page=100`;
     const prsRes = await fetch(prsUrl, { headers, next: { revalidate } });
     const prs: GhPR[] = prsRes.ok ? await prsRes.json() : [];
 
-    // Build a map of lowercase handle → PR URL for open PRs
-    const openPrByHandle = new Map<string, string>(
+    const openPrByHandle = new Map<string, { url: string; createdAt: string }>(
       prs
-        .map((pr) => {
+        .map((pr): [string, { url: string; createdAt: string }] => {
           const handle = handleFromBranch(pr.head.ref) ?? pr.user.login.toLowerCase();
-          return [handle, pr.html_url] as [string, string];
+          return [handle, { url: pr.html_url, createdAt: pr.created_at }];
         })
         .filter(([h]) => Boolean(h))
     );
     const openPrHandles = new Set(openPrByHandle.keys());
 
-    // ── 2. List JSON files in the submissions directory ──────────────────────
+    // ── 2. List JSON files ───────────────────────────────────────────────────
     const contentsUrl = `https://api.github.com/repos/${UPSTREAM_REPO}/contents/${config.submissionsPath}?ref=${config.branch}`;
     const contentsRes = await fetch(contentsUrl, { headers, next: { revalidate } });
 
     if (!contentsRes.ok) {
-      // Branch or path doesn't exist yet — return open-PR stubs only (with resolved names)
       const stubMembers = await Promise.all(
         prs.map(async (pr, i) => {
           const handle = handleFromBranch(pr.head.ref) ?? pr.user.login;
@@ -96,6 +95,7 @@ export async function GET(req: NextRequest) {
             status: "pr_open" as Status,
             week,
             prUrl: pr.html_url,
+            submittedAt: pr.created_at,
           };
         })
       );
@@ -105,17 +105,33 @@ export async function GET(req: NextRequest) {
     const files: GhFile[] = await contentsRes.json();
     const jsonFiles = files.filter((f) => f.name.endsWith(".json"));
 
-    // ── 3. Fetch + parse each submission JSON ────────────────────────────────
+    // ── 3. Fetch submission JSON + commit timestamp in parallel ──────────────
     const settled = await Promise.allSettled(
       jsonFiles.map(async (f) => {
-        const res = await fetch(f.download_url, { next: { revalidate } });
-        if (!res.ok) return null;
-        const data: GhSubmission = await res.json();
+        const [dataRes, commitRes] = await Promise.allSettled([
+          fetch(f.download_url, { next: { revalidate } }),
+          fetch(
+            `https://api.github.com/repos/${UPSTREAM_REPO}/commits?path=${config.submissionsPath}/${f.name}&sha=${config.branch}&per_page=1`,
+            { headers, next: { revalidate } }
+          ),
+        ]);
+
+        if (dataRes.status !== "fulfilled" || !dataRes.value.ok) return null;
+        const data: GhSubmission = await dataRes.value.json();
         if (!data.githubHandle) return null;
 
         const handleLower = data.githubHandle.toLowerCase();
         const status: Status = openPrHandles.has(handleLower) ? "pr_open" : "submitted";
         const fileUrl = `https://github.com/${UPSTREAM_REPO}/blob/${config.branch}/${config.submissionsPath}/${f.name}`;
+        const pr = openPrByHandle.get(handleLower);
+
+        let submittedAt: string | undefined;
+        if (pr) {
+          submittedAt = pr.createdAt;
+        } else if (commitRes.status === "fulfilled" && commitRes.value.ok) {
+          const commits: GhCommit[] = await commitRes.value.json();
+          submittedAt = commits[0]?.commit.author.date;
+        }
 
         const member: Member = {
           id: `gh-${data.githubHandle}`,
@@ -127,8 +143,9 @@ export async function GET(req: NextRequest) {
           loomUrl: data.loomUrl || undefined,
           status,
           week,
-          prUrl: openPrByHandle.get(handleLower),
+          prUrl: pr?.url,
           submissionUrl: fileUrl,
+          submittedAt,
         };
         return member;
       })
@@ -138,26 +155,22 @@ export async function GET(req: NextRequest) {
       .map((r) => (r.status === "fulfilled" ? r.value : null))
       .filter((m): m is Member => m !== null);
 
-    // ── 4. Add PR-only stubs for open PRs whose file isn't merged yet ────────
+    // ── 4. Add PR-only stubs ─────────────────────────────────────────────────
     const mergedHandles = new Set(members.map((m) => m.githubHandle.toLowerCase()));
     const prStubs = prs
-      .map((pr) => handleFromBranch(pr.head.ref) ?? pr.user.login)
-      .filter((handle) => !mergedHandles.has(handle.toLowerCase()));
+      .map((pr) => ({ handle: handleFromBranch(pr.head.ref) ?? pr.user.login, pr }))
+      .filter(({ handle }) => !mergedHandles.has(handle.toLowerCase()));
 
-    // Resolve real display names from GitHub user profiles (best-effort)
     const resolvedStubs = await Promise.allSettled(
-      prStubs.map(async (handle, i) => {
+      prStubs.map(async ({ handle, pr }, i) => {
         let displayName = handle;
         try {
-          const userRes = await fetch(
-            `https://api.github.com/users/${handle}`,
-            { headers, next: { revalidate } }
-          );
+          const userRes = await fetch(`https://api.github.com/users/${handle}`, { headers, next: { revalidate } });
           if (userRes.ok) {
             const userData = await userRes.json();
             if (userData.name) displayName = userData.name;
           }
-        } catch { /* fall back to handle */ }
+        } catch { /* fall back */ }
 
         return {
           id: `gh-pr-${i}`,
@@ -165,7 +178,8 @@ export async function GET(req: NextRequest) {
           githubHandle: handle,
           status: "pr_open" as Status,
           week,
-          prUrl: openPrByHandle.get(handle.toLowerCase()),
+          prUrl: pr.html_url,
+          submittedAt: pr.created_at,
         } satisfies Member;
       })
     );

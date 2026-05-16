@@ -22,6 +22,19 @@ export default function KanbanBoard({ members, onEdit, loading }: KanbanBoardPro
     {} as Record<Status, Member[]>
   );
 
+  // Sort: not_started alphabetically; pr_open/submitted by submittedAt then alpha
+  function sortCards(cards: Member[], status: Status): Member[] {
+    if (status === "not_started") {
+      return [...cards].sort((a, b) => a.name.localeCompare(b.name));
+    }
+    return [...cards].sort((a, b) => {
+      if (a.submittedAt && b.submittedAt) return a.submittedAt.localeCompare(b.submittedAt);
+      if (a.submittedAt) return -1;
+      if (b.submittedAt) return 1;
+      return a.name.localeCompare(b.name);
+    });
+  }
+
   return (
     <div className="flex gap-3 h-full overflow-x-auto p-3 rounded-2xl border border-[#2e2e38]">
       {STATUS_ORDER.map((status) => {
@@ -39,7 +52,7 @@ export default function KanbanBoard({ members, onEdit, loading }: KanbanBoardPro
               )}
             </div>
             <div className="flex flex-col gap-2.5 overflow-y-auto flex-1 min-h-0 pb-2 pr-1">
-              {cards.map((member) => (
+              {sortCards(cards, status).map((member) => (
                 <MemberCard key={member.id} member={member} onClick={() => onEdit(member)} />
               ))}
             </div>

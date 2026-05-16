@@ -14,6 +14,8 @@ export interface Member {
   prUrl?: string;
   /** Direct link to the submission JSON file on GitHub */
   submissionUrl?: string;
+  /** ISO timestamp when the submission was made or PR was opened */
+  submittedAt?: string;
 }
 
 export interface Week {
