@@ -245,7 +245,11 @@ export default function Home() {
                   </svg>
                   {loading ? "syncing…" : lastFetched ? relTime(lastFetched) : "sync"}
                 </button>
-                {wState === "live" && CountdownBadge}
+                {CountdownBadge && (
+                  <div className={wState !== "live" ? "opacity-40" : ""}>
+                    {CountdownBadge}
+                  </div>
+                )}
                 <button
                   onClick={() => setEditTarget("new")}
                   className="bg-white text-black text-sm font-medium px-4 py-1.5 rounded-lg hover:bg-gray-200 transition-colors"
