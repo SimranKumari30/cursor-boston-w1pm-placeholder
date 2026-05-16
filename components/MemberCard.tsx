@@ -32,7 +32,7 @@ export default function MemberCard({ member, onClick }: MemberCardProps) {
         <div className="flex-1 min-w-0">
           <div className="flex items-start gap-1.5">
             <span className="text-sm font-medium text-white leading-snug">{member.name}</span>
-            {complete && <span className="w-1.5 h-1.5 rounded-full bg-green-400 flex-shrink-0 mt-1.5" />}
+            {complete && member.status !== "not_started" && <span className="w-1.5 h-1.5 rounded-full bg-green-400 flex-shrink-0 mt-1.5" />}
           </div>
         </div>
         {/* GitHub source link */}
@@ -50,8 +50,8 @@ export default function MemberCard({ member, onClick }: MemberCardProps) {
         )}
       </div>
 
-      {/* Missing field pills */}
-      {missing.length > 0 && (
+      {/* Missing field pills — only for active submissions */}
+      {member.status !== "not_started" && missing.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mt-2">
           {missing.map((field) => (
             <span key={field} className="text-[10px] text-gray-500 bg-[#2a2a35] px-2 py-0.5 rounded-full">
@@ -61,8 +61,8 @@ export default function MemberCard({ member, onClick }: MemberCardProps) {
         </div>
       )}
 
-      {/* Complete — show clickable field links */}
-      {complete && (
+      {/* Complete field links — only for active submissions */}
+      {member.status !== "not_started" && complete && (
         <div className="flex gap-1.5 mt-2 flex-wrap">
           {member.repoUrl && (
             <a href={member.repoUrl} target="_blank" rel="noopener noreferrer"

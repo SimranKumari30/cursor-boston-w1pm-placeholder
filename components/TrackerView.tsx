@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Member, WEEKS, avatarColor, getInitials } from "@/lib/data";
+import { Member, WEEKS, weekState, avatarColor, getInitials } from "@/lib/data";
 
 type CellStatus = "submitted" | "pr_open" | "not_started" | null;
 
@@ -14,7 +14,7 @@ interface MatrixRow {
 const CELL_CONFIG: Record<NonNullable<CellStatus>, { label: string; bg: string; text: string }> = {
   submitted:   { label: "Submitted",   bg: "bg-blue-400/10",  text: "text-blue-400" },
   pr_open:     { label: "PR Open",     bg: "bg-green-400/10", text: "text-green-400" },
-  not_started: { label: "Not Started", bg: "bg-[#2a2a35]",    text: "text-gray-500" },
+  not_started: { label: "Not Started", bg: "bg-[#1e1e24]",    text: "text-gray-600" },
 };
 
 export default function TrackerView() {
@@ -41,8 +41,7 @@ export default function TrackerView() {
 
   useEffect(() => { fetchAll(); }, []);
 
-  // Build matrix: collect all unique members (by githubHandle), ordered by
-  // first appearance, then fill in their status per week.
+  // Build matrix: collect all unique members across ALL weeks, ordered by first appearance
   const handleOrder: string[] = [];
   const handleToInfo: Record<string, { name: string; githubHandle: string }> = {};
 
@@ -56,13 +55,32 @@ export default function TrackerView() {
     });
   });
 
+  // Compute which weeks are past or live (member "should have" submitted)
+  const now = new Date();
+  const activeWeekIds = new Set(
+    WEEKS.filter((w) => {
+      const deadline = new Date(`${w.deadlineDate}T17:00:00-05:00`);
+      return now >= new Date(deadline.getTime() - w.id * 0) ; // all non-upcoming
+    }).map((w) => w.id)
+  );
+  // Simpler: a week is "active" if it's not upcoming
+  const liveWeekId = (() => {
+    for (const w of WEEKS) {
+      if (new Date(`${w.deadlineDate}T17:00:00-05:00`) >= now) return w.id;
+    }
+    return WEEKS[WEEKS.length - 1].id;
+  })();
+
   const matrix: MatrixRow[] = handleOrder.map((key) => ({
     ...handleToInfo[key],
-    cells: WEEKS.map((_, i) => {
+    cells: WEEKS.map((week, i) => {
       const found = allMembers[i]?.find(
         (m) => m.githubHandle.toLowerCase() === key
       );
-      return (found?.status as CellStatus) ?? null;
+      if (found) return found.status as CellStatus;
+      // Show "not started" for past and live weeks; null (—) for upcoming
+      const wState = weekState(week, liveWeekId);
+      return wState === "upcoming" ? null : "not_started";
     }),
   }));
 
@@ -159,7 +177,7 @@ export default function TrackerView() {
                               {cfg.label}
                             </span>
                           ) : (
-                            <span className="text-gray-700 text-xs">—</span>
+                            <span className="text-gray-800 text-xs">—</span>
                           )}
                         </td>
                       );
