@@ -163,6 +163,13 @@ export default function Home() {
     </div>
   ) : null;
 
+  const ClosedBadge = (
+    <div className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border bg-gray-500/10 border-gray-700 text-gray-600">
+      <span className="w-1.5 h-1.5 rounded-full bg-gray-700" />
+      Closed
+    </div>
+  );
+
   // ── GitHub source link ────────────────────────────────────────────────────
   const GhLink = sourceUrl ? (
     <a
@@ -243,9 +250,9 @@ export default function Home() {
                   </svg>
                   {loading ? "syncing…" : lastFetched ? relTime(lastFetched) : "sync"}
                 </button>
-                {CountdownBadge && (
-                  <div className={wState === "past" ? "invisible" : ""}>
-                    {CountdownBadge}
+                {(CountdownBadge || wState === "past") && (
+                  <div>
+                    {wState === "past" ? ClosedBadge : CountdownBadge}
                   </div>
                 )}
                 <button
