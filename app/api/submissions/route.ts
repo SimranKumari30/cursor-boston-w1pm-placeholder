@@ -20,6 +20,8 @@ interface GhFile {
 
 // GitHub PR shape (abbreviated)
 interface GhPR {
+  number: number;
+  html_url: string;
   head: { ref: string };
   user: { login: string };
 }
@@ -59,12 +61,16 @@ export async function GET(req: NextRequest) {
     const prsRes = await fetch(prsUrl, { headers, next: { revalidate } });
     const prs: GhPR[] = prsRes.ok ? await prsRes.json() : [];
 
-    // Build a set of lowercase handles that have open PRs
-    const openPrHandles = new Set<string>(
+    // Build a map of lowercase handle → PR URL for open PRs
+    const openPrByHandle = new Map<string, string>(
       prs
-        .map((pr) => handleFromBranch(pr.head.ref) ?? pr.user.login.toLowerCase())
-        .filter(Boolean)
+        .map((pr) => {
+          const handle = handleFromBranch(pr.head.ref) ?? pr.user.login.toLowerCase();
+          return [handle, pr.html_url] as [string, string];
+        })
+        .filter(([h]) => Boolean(h))
     );
+    const openPrHandles = new Set(openPrByHandle.keys());
 
     // ── 2. List JSON files in the submissions directory ──────────────────────
     const contentsUrl = `https://api.github.com/repos/${UPSTREAM_REPO}/contents/${config.submissionsPath}?ref=${config.branch}`;
@@ -83,10 +89,17 @@ export async function GET(req: NextRequest) {
               if (userData.name) displayName = userData.name;
             }
           } catch { /* fall back */ }
-          return { id: `gh-pr-${i}`, name: displayName, githubHandle: handle, status: "pr_open" as Status, week };
+          return {
+            id: `gh-pr-${i}`,
+            name: displayName,
+            githubHandle: handle,
+            status: "pr_open" as Status,
+            week,
+            prUrl: pr.html_url,
+          };
         })
       );
-      return NextResponse.json({ members: stubMembers });
+      return NextResponse.json({ members: stubMembers, sourceUrl: contentsUrl });
     }
 
     const files: GhFile[] = await contentsRes.json();
@@ -102,6 +115,7 @@ export async function GET(req: NextRequest) {
 
         const handleLower = data.githubHandle.toLowerCase();
         const status: Status = openPrHandles.has(handleLower) ? "pr_open" : "submitted";
+        const fileUrl = `https://github.com/${UPSTREAM_REPO}/blob/${config.branch}/${config.submissionsPath}/${f.name}`;
 
         const member: Member = {
           id: `gh-${data.githubHandle}`,
@@ -113,6 +127,8 @@ export async function GET(req: NextRequest) {
           loomUrl: data.loomUrl || undefined,
           status,
           week,
+          prUrl: openPrByHandle.get(handleLower),
+          submissionUrl: fileUrl,
         };
         return member;
       })
@@ -149,6 +165,7 @@ export async function GET(req: NextRequest) {
           githubHandle: handle,
           status: "pr_open" as Status,
           week,
+          prUrl: openPrByHandle.get(handle.toLowerCase()),
         } satisfies Member;
       })
     );
@@ -157,7 +174,7 @@ export async function GET(req: NextRequest) {
       if (r.status === "fulfilled") members.push(r.value);
     });
 
-    return NextResponse.json({ members, fetchedAt: new Date().toISOString() });
+    return NextResponse.json({ members, sourceUrl: contentsUrl, fetchedAt: new Date().toISOString() });
   } catch (err) {
     console.error("[submissions API]", err);
     return NextResponse.json({ members: [], error: String(err) }, { status: 500 });

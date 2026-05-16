@@ -10,6 +10,10 @@ export interface Member {
   loomUrl?: string;
   status: Status;
   week: number;
+  /** Direct link to the open GitHub PR (for pr_open entries) */
+  prUrl?: string;
+  /** Direct link to the submission JSON file on GitHub */
+  submissionUrl?: string;
 }
 
 export interface Week {

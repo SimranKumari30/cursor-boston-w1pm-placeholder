@@ -19,20 +19,26 @@ export default function Home() {
   const [localMembers, setLocalMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(false);
   const [lastFetched, setLastFetched] = useState<Date | null>(null);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [sourceUrl, setSourceUrl] = useState<string | null>(null);
   const [editTarget, setEditTarget] = useState<Member | null | "new">(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // ── GitHub fetch ─────────────────────────────────────────────────────────────
   const fetchFromGitHub = useCallback(async (week: number) => {
     setLoading(true);
+    setFetchError(null);
     try {
       const res = await fetch(`/api/submissions?week=${week}`);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) throw new Error(`GitHub API returned HTTP ${res.status}`);
       const data = await res.json();
       setGhMembers((data.members as Member[]) ?? []);
+      if (data.sourceUrl) setSourceUrl(data.sourceUrl);
       setLastFetched(new Date());
     } catch (err) {
-      console.warn("[ShipTrack] GitHub fetch failed:", err);
+      const msg = err instanceof Error ? err.message : String(err);
+      console.warn("[ShipTrack] GitHub fetch failed:", msg);
+      setFetchError(msg);
     } finally {
       setLoading(false);
     }
@@ -112,7 +118,7 @@ export default function Home() {
         <Sidebar activeNav={activeNav} onNavChange={setActiveNav} />
       </div>
 
-      <div className="flex-1 flex flex-col overflow-x-auto overflow-y-hidden min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-x-auto overflow-y-hidden">
         {/* ── Header ─────────────────────────────────────────────────────────── */}
         <div
           className="flex items-center justify-between px-6 py-4 border-b border-[#1e1e24] flex-shrink-0"
@@ -139,9 +145,26 @@ export default function Home() {
                   </span>
                 )}
               </div>
-              <p className="text-xs text-gray-500 mt-0.5">
-                Week {week.id} of {WEEKS.length} · {week.deadline} deadline
-              </p>
+              <div className="flex items-center gap-2 mt-0.5">
+                <p className="text-xs text-gray-500">
+                  Week {week.id} of {WEEKS.length} · {week.deadline} deadline
+                </p>
+                {/* GitHub source link — proves data is live */}
+                {sourceUrl && (
+                  <a
+                    href={sourceUrl.replace("api.github.com/repos", "github.com").replace("/contents/", "/tree/").split("?")[0]}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 text-[10px] text-gray-600 hover:text-gray-400 transition-colors"
+                    title="View submissions folder on GitHub"
+                  >
+                    <svg className="w-2.5 h-2.5" viewBox="0 0 16 16" fill="currentColor">
+                      <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+                    </svg>
+                    github
+                  </a>
+                )}
+              </div>
             </div>
           </div>
 
@@ -199,9 +222,28 @@ export default function Home() {
           liveWeek={LIVE_WEEK}
         />
 
+        {/* ── GitHub fetch error banner ───────────────────────────────────────── */}
+        {fetchError && (
+          <div className="flex items-center gap-2 px-6 py-2 bg-red-500/10 border-b border-red-500/20 flex-shrink-0" style={{ minWidth: "680px" }}>
+            <svg className="w-3.5 h-3.5 text-red-400 flex-shrink-0" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm.75 10.5h-1.5v-1.5h1.5v1.5zm0-3h-1.5v-4h1.5v4z"/>
+            </svg>
+            <p className="text-xs text-red-400 flex-1">
+              GitHub sync failed: <span className="font-mono">{fetchError}</span>
+              {" — "}showing cached data.
+              {!process.env.NEXT_PUBLIC_HAS_TOKEN && (
+                <span className="text-red-300/70"> Set <span className="font-mono">GITHUB_TOKEN</span> env var to avoid rate limits.</span>
+              )}
+            </p>
+            <button onClick={() => fetchFromGitHub(activeWeek)} className="text-xs text-red-400 hover:text-red-300 underline flex-shrink-0">
+              Retry
+            </button>
+          </div>
+        )}
+
         {/* ── Views ──────────────────────────────────────────────────────────── */}
         {activeNav === "Board" && (
-          <div className="flex-1 overflow-y-hidden px-6 py-5" style={{ minWidth: "680px" }}>
+          <div className="flex-1 min-h-0 overflow-hidden px-6 py-5" style={{ minWidth: "680px" }}>
             {loading && members.length === 0 ? (
               /* Loading skeleton */
               <div className="flex gap-4 h-full">

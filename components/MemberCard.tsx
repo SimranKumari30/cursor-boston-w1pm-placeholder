@@ -40,6 +40,19 @@ export default function MemberCard({ member, onClick }: MemberCardProps) {
             <p className="text-xs text-gray-600 mt-0.5 italic">No pitch yet</p>
           )}
         </div>
+        {/* GitHub source link */}
+        {(member.prUrl || member.submissionUrl) && (
+          <a
+            href={member.prUrl ?? member.submissionUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            title={member.prUrl ? "View PR on GitHub" : "View submission on GitHub"}
+            className="flex-shrink-0 text-[10px] text-gray-600 hover:text-gray-300 transition-colors px-1.5 py-0.5 rounded border border-[#2e2e38] hover:border-[#4a4a58] font-mono"
+          >
+            GH
+          </a>
+        )}
       </div>
 
       {/* Missing field pills */}
